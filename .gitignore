@@ -1,0 +1,9 @@
+.terraform
+tf.plan
+ssh/*
+!ssh/.gitkeep
+txt-files/*
+!txt-files/.gitkeep
+swarm/*
+!swarm/portainer-tpl.yml
+!swarm/traefik-tpl.yml

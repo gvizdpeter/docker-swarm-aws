@@ -1,0 +1,47 @@
+version: "3.7"
+
+services:
+  traefik:
+    image: traefik:v2.4
+    command:
+      - --log.filePath=/var/log/traefik.log
+      - --log.format=json
+      - --log.level=WARN
+      - --accesslog=true      
+      - --accesslog.filepath=/var/log/access.log
+      - --metrics.prometheus=true
+      - --metrics.prometheus.addEntryPointsLabels=true
+      - --metrics.prometheus.addServicesLabels=true
+      - --entryPoints.web.address=:80
+      - --api=true
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --providers.docker.swarmMode=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.exposedByDefault=false
+      - --providers.docker.network=traefik-public
+      - --providers.docker.watch=true
+    networks:
+      - traefik-public
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${shared_volume_mountpoint}/traefik:/var/log
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager      
+      labels:
+        - traefik.enable=true
+        - "traefik.http.routers.api.rule=Host(`traefik.${swarm_domain}`)"
+        - "traefik.http.routers.api.service=api@internal"
+        - "traefik.http.services.api.loadbalancer.server.port=8080"
+        - "traefik.http.routers.prometheus.rule=Host(`traefik.${swarm_domain}`) && (PathPrefix(`/metrics`))"
+        - "traefik.http.routers.prometheus.service=prometheus@internal"
+        - "traefik.http.services.prometheus.loadbalancer.server.port=9000"
+
+networks:
+  traefik-public:
+    external: true

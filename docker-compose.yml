@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  terraform:
+    image: hashicorp/terraform:0.14.7
+    entrypoint: /home/terraform-entrypoint.sh
+    working_dir: /home/terraform
+    env_file: 
+      - .env
+    volumes:
+      - ./:/home
+  
+  packer:
+    image: hashicorp/packer:1.7.0
+    entrypoint: /home/packer/packer-entrypoint.sh
+    working_dir: /home/packer
+    env_file: 
+      - .env
+    volumes:
+      - ./:/home/packer
