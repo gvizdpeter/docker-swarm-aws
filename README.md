@@ -16,3 +16,5 @@ All nodes have shared efs volume. Worker nodes are part of autoscaling group wit
 In public subnet is placed bastion host with load balancer. Wildcard DNS record is pointing to public IP address of load balancer. On load balancer is set ssl termination and traffic is routed to docker swarm managers.
 
 On startup of docker swarm, portainer and traefik stacks are deployed according to files placed in swarm folder. Portainer can be accessed on url https://portainer.your-domain and you can login by credentials admin:${PORTAINER_PASSWORD}. Traefik dashboard can be accessed on url https://traefik.your-domain and metrics can be accessed on url https://traefik.your-domain/metrics.
+
+Before run please check values in .env file and also S3 remote state configuration in terraform/backend.tf. Variable TF_VAR_CREATE_HOSTED_ZONE controls wether to create hosted zone or not. It could be useful if you want to prevent changing AWS name servers.
