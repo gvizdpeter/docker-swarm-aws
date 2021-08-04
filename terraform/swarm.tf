@@ -28,7 +28,7 @@ resource "aws_instance" "swarm-manager" {
   user_data              = data.template_cloudinit_config.swarm-manager-cloudinit.rendered
   root_block_device {
     volume_size = 8
-  }  
+  }
 
   tags = {
     Name = "swarm-manager-${count.index}"

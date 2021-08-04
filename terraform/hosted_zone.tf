@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "primary" {
-  name = var.AWS_SWARM_DOMAIN
+  name  = var.AWS_SWARM_DOMAIN
   count = var.CREATE_HOSTED_ZONE ? 1 : 0
 }
 
