@@ -1,5 +1,5 @@
 data "template_file" "worker-init-config" {
-  template = file("${path.cwd}/init/leader-init.cfg")
+  template = file("${path.cwd}/init/worker-init.cfg")
   vars = {
     DEVICE       = "${aws_efs_file_system.main-efs.id}:/"
     MOUNT_POINT  = var.AWS_SHARED_VOLUME_MOUNTPOINT
@@ -41,7 +41,7 @@ data "template_cloudinit_config" "swarm-manager-cloudinit" {
 }
 
 data "template_file" "leader-init-config" {
-  template = file("${path.cwd}/init/worker-init.cfg")
+  template = file("${path.cwd}/init/leader-init.cfg")
   vars = {
     DEVICE        = "${aws_efs_file_system.main-efs.id}:/"
     MOUNT_POINT   = var.AWS_SHARED_VOLUME_MOUNTPOINT
