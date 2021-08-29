@@ -1,9 +1,6 @@
 .terraform
 tf.plan
-ssh/*
-!ssh/.gitkeep
-txt-files/*
-!txt-files/.gitkeep
-swarm/*
-!swarm/portainer-tpl.yml
-!swarm/traefik-tpl.yml
+terraform/ssh/*
+!terraform/ssh/.gitkeep
+terraform/ip-files/*
+!terraform/ip-files/.gitkeep
