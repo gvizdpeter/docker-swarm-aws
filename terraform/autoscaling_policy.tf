@@ -1,13 +1,13 @@
-resource "aws_autoscaling_policy" "high-cpu-policy" {
+resource "aws_autoscaling_policy" "high_cpu_policy" {
   name                   = "high-cpu-policy"
-  autoscaling_group_name = aws_autoscaling_group.swarm-worker-autoscaling.name
+  autoscaling_group_name = aws_autoscaling_group.swarm_worker_autoscaling.name
   adjustment_type        = "ChangeInCapacity"
   scaling_adjustment     = "1"
   cooldown               = "120"
   policy_type            = "SimpleScaling"
 }
 
-resource "aws_cloudwatch_metric_alarm" "high-cpu-alarm" {
+resource "aws_cloudwatch_metric_alarm" "high_cpu_alarm" {
   alarm_name          = "high-cpu-alarm"
   alarm_description   = "high-cpu-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -19,23 +19,23 @@ resource "aws_cloudwatch_metric_alarm" "high-cpu-alarm" {
   threshold           = var.HIGH_CPU_THRESH
 
   dimensions = {
-    "AutoScalingGroupName" = aws_autoscaling_group.swarm-worker-autoscaling.name
+    "AutoScalingGroupName" = aws_autoscaling_group.swarm_worker_autoscaling.name
   }
 
   actions_enabled = true
-  alarm_actions   = [aws_autoscaling_policy.high-cpu-policy.arn]
+  alarm_actions   = [aws_autoscaling_policy.high_cpu_policy.arn]
 }
 
-resource "aws_autoscaling_policy" "low-cpu-policy" {
+resource "aws_autoscaling_policy" "low_cpu_policy" {
   name                   = "low-cpu-policy"
-  autoscaling_group_name = aws_autoscaling_group.swarm-worker-autoscaling.name
+  autoscaling_group_name = aws_autoscaling_group.swarm_worker_autoscaling.name
   adjustment_type        = "ChangeInCapacity"
   scaling_adjustment     = "-1"
   cooldown               = "120"
   policy_type            = "SimpleScaling"
 }
 
-resource "aws_cloudwatch_metric_alarm" "low-cpu-alarm" {
+resource "aws_cloudwatch_metric_alarm" "low_cpu_alarm" {
   alarm_name          = "low-cpu-alarm"
   alarm_description   = "low-cpu-alarm"
   comparison_operator = "LessThanOrEqualToThreshold"
@@ -47,9 +47,9 @@ resource "aws_cloudwatch_metric_alarm" "low-cpu-alarm" {
   threshold           = var.LOW_CPU_THRESH
 
   dimensions = {
-    "AutoScalingGroupName" = aws_autoscaling_group.swarm-worker-autoscaling.name
+    "AutoScalingGroupName" = aws_autoscaling_group.swarm_worker_autoscaling.name
   }
 
   actions_enabled = true
-  alarm_actions   = [aws_autoscaling_policy.low-cpu-policy.arn]
+  alarm_actions   = [aws_autoscaling_policy.low_cpu_policy.arn]
 }

@@ -3,10 +3,11 @@
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "aws_region": "{{env `AWS_DEFAULT_REGION`}}",
-    "aws_ami_id": "{{env `AWS_DEFAULT_AMI_ID`}}",
-    "aws_instance_type": "{{env `TF_VAR_AWS_INSTANCE_TYPE`}}",
+    "aws_ami_id": "{{env `TF_VAR_DEFAULT_AMI_ID`}}",
+    "aws_instance_type": "{{env `TF_VAR_AWS_SWARM_INSTANCE_TYPE`}}",
     "aws_instance_username": "{{env `TF_VAR_AWS_INSTANCE_USERNAME`}}",
-    "aws_instance_shared_volume_mountpoint": "{{env `TF_VAR_AWS_SHARED_VOLUME_MOUNTPOINT`}}"    
+    "aws_vpc_id": "{{env `VPC_ID`}}",
+    "aws_subnet_id": "{{env `SUBNET_ID`}}"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -16,8 +17,9 @@
     "source_ami": "{{user `aws_ami_id`}}",
     "instance_type": "{{user `aws_instance_type`}}",
     "ssh_username": "{{user `aws_instance_username`}}",
-    "ami_name": "aws-swarm-instance-{{timestamp}}"
-    
+    "ami_name": "aws-swarm-instance-{{timestamp}}",
+    "vpc_id": "{{user `aws_vpc_id`}}",
+    "subnet_id": "{{user `aws_subnet_id`}}"
   }],
   "provisioners": [{
     "type": "shell",
@@ -33,12 +35,10 @@
       "cd ..",
       "rm -rf efs-utils",
       "sudo systemctl enable --now docker",
-      "sudo usermod -aG docker ${INSTANCE_USERNAME}",
-      "sudo mkdir -p ${SHARED_VOLUME_MOUNTPOINT}"
+      "sudo usermod -aG docker ${INSTANCE_USERNAME}"
     ],
     "environment_vars": [
-      "INSTANCE_USERNAME={{user `aws_instance_username`}}",
-      "SHARED_VOLUME_MOUNTPOINT={{user `aws_instance_shared_volume_mountpoint`}}"
-    ]    
-  }]  
+      "INSTANCE_USERNAME={{user `aws_instance_username`}}"
+    ]
+  }]
 }

@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "terraform-remote-state"
+    bucket = "k8-test-tf"
     key    = "docker-swarm-aws/terraform.tfstate"
   }
 }

@@ -2,21 +2,21 @@ resource "aws_eip" "nat" {
   vpc = true
 }
 
-resource "aws_nat_gateway" "main-nat-gw" {
+resource "aws_nat_gateway" "main_nat_gw" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.main-public-subnet.id
-  depends_on    = [aws_internet_gateway.main-public-gw]
+  subnet_id     = aws_subnet.main_public_subnet.id
+  depends_on    = [aws_internet_gateway.main_public_gw]
 
   tags = {
     Name = "main-nat-gw"
   }
 }
 
-resource "aws_route_table" "main-private-route-table" {
-  vpc_id = aws_vpc.main-vpc.id
+resource "aws_route_table" "main_private_route_table" {
+  vpc_id = aws_vpc.main_vpc.id
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main-nat-gw.id
+    nat_gateway_id = aws_nat_gateway.main_nat_gw.id
   }
 
   tags = {
@@ -24,7 +24,7 @@ resource "aws_route_table" "main-private-route-table" {
   }
 }
 
-resource "aws_route_table_association" "main-private-route-table-assoc" {
-  subnet_id      = aws_subnet.main-private-subnet.id
-  route_table_id = aws_route_table.main-private-route-table.id
+resource "aws_route_table_association" "main_private_route_table_assoc" {
+  subnet_id      = aws_subnet.main_private_subnet.id
+  route_table_id = aws_route_table.main_private_route_table.id
 }

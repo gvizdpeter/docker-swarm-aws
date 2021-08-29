@@ -1,11 +1,6 @@
-variable "AWS_MANAGER_INSTANCE_TYPE" {
+variable "AWS_SWARM_INSTANCE_TYPE" {
   type        = string
-  description = "Instance type of docker swarm manager"
-}
-
-variable "AWS_WORKER_INSTANCE_TYPE" {
-  type        = string
-  description = "Instance type of docker swarm worker"
+  description = "Instance type of docker swarm instance"
 }
 
 variable "AWS_MANAGER_COUNT" {
@@ -37,31 +32,24 @@ variable "AWS_MAX_WORKER_COUNT" {
 
 variable "AWS_AMI_ID_FILE" {
   type        = string
-  default     = "txt-files/packer-ami.txt"
+  default     = "packer/packer-ami.txt"
   description = "Path to file with AMI ID of packer image with docker"
 }
 
-variable "TRAEFIK_FILE" {
+variable "DEFAULT_AMI_ID" {
   type        = string
-  default     = "swarm/docker-compose.traefik.yml"
-  description = "Path to docker compose stack file of traefik"
-}
-
-variable "PORTAINER_FILE" {
-  type        = string
-  default     = "swarm/docker-compose.portainer.yml"
-  description = "Path to docker compose stack file of portainer"
+  description = "default AMI ID for packer"
 }
 
 variable "WORKER_TOKEN_FILE" {
   type        = string
-  default     = "swarm/worker-token.txt"
+  default     = "worker-token.txt"
   description = "Path to worker token file"
 }
 
 variable "MANAGER_TOKEN_FILE" {
   type        = string
-  default     = "swarm/manager-token.txt"
+  default     = "manager-token.txt"
   description = "Path to manager token file"
 }
 
@@ -88,11 +76,6 @@ variable "AWS_SWARM_DOMAIN" {
   description = "Docker swarm domain in AWS Route 53"
 }
 
-variable "MY_IP" {
-  type        = string
-  description = "My public IP for bastion connection"
-}
-
 variable "AWS_DEFAULT_AZ" {
   type        = string
   description = "Default AWS availability zone"
@@ -107,13 +90,13 @@ variable "AWS_SHARED_VOLUME_MOUNTPOINT" {
 
 variable "BASTION_IP_FILE" {
   type        = string
-  default     = "txt-files/ip-bastion.txt"
+  default     = "ip-files/ip-bastion.txt"
   description = "Output file for bastion IP"
 }
 
 variable "SWARM_LEADER_IP_FILE" {
   type        = string
-  default     = "txt-files/ip-swarm-leader.txt"
+  default     = "ip-files/ip-swarm-leader.txt"
   description = "Output file for swarm leader IP"
 }
 
@@ -129,13 +112,24 @@ variable "HIGH_CPU_THRESH" {
   description = "High CPU thresh for worker autoscaling"
 }
 
-variable "PORTAINER_ADMIN_PASSWORD" {
+variable "AUTH_PASSWORD" {
   type        = string
-  description = "Admin password for portainer"
+  description = "Auth password"
+}
+
+variable "AUTH_USERNAME" {
+  type        = string
+  description = "Auth username"
 }
 
 variable "CREATE_HOSTED_ZONE" {
   type        = bool
   default     = false
   description = "Flag if create hosted zone"
+}
+
+variable "CONNECTION_TIMEOUT" {
+  type        = string
+  default     = "30s"
+  description = "Connection timeout for provisioner"
 }

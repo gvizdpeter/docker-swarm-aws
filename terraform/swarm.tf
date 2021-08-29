@@ -1,16 +1,17 @@
-resource "aws_instance" "swarm-leader" {
-  ami                    = file("${path.cwd}/${var.AWS_AMI_ID_FILE}")
-  instance_type          = var.AWS_MANAGER_INSTANCE_TYPE
-  subnet_id              = aws_subnet.main-private-subnet.id
+resource "aws_instance" "swarm_leader" {
+  ami                    = data.local_file.packer_ami_file.content
+  instance_type          = var.AWS_SWARM_INSTANCE_TYPE
+  subnet_id              = aws_subnet.main_private_subnet.id
   key_name               = aws_key_pair.swarmkey.key_name
-  vpc_security_group_ids = [aws_security_group.main-swarm-instance-security-group.id]
-  user_data              = data.template_cloudinit_config.swarm-leader-cloudinit.rendered
+  vpc_security_group_ids = [aws_security_group.main_swarm_instance_security_group.id]
+  user_data              = data.template_cloudinit_config.swarm_leader_cloudinit.rendered
   root_block_device {
     volume_size = 8
   }
 
   depends_on = [
-    aws_efs_mount_target.main-efs-mount-target
+    null_resource.packer_instance,
+    aws_efs_mount_target.main_efs_mount_target
   ]
 
   tags = {
@@ -18,14 +19,14 @@ resource "aws_instance" "swarm-leader" {
   }
 }
 
-resource "aws_instance" "swarm-manager" {
+resource "aws_instance" "swarm_manager" {
   count                  = var.AWS_MANAGER_COUNT - 1
-  ami                    = file("${path.cwd}/${var.AWS_AMI_ID_FILE}")
-  instance_type          = var.AWS_MANAGER_INSTANCE_TYPE
-  subnet_id              = aws_subnet.main-private-subnet.id
+  ami                    = data.local_file.packer_ami_file.content
+  instance_type          = var.AWS_SWARM_INSTANCE_TYPE
+  subnet_id              = aws_subnet.main_private_subnet.id
   key_name               = aws_key_pair.swarmkey.key_name
-  vpc_security_group_ids = [aws_security_group.main-swarm-instance-security-group.id]
-  user_data              = data.template_cloudinit_config.swarm-manager-cloudinit.rendered
+  vpc_security_group_ids = [aws_security_group.main_swarm_instance_security_group.id]
+  user_data              = data.template_cloudinit_config.swarm_manager_cloudinit.rendered
   root_block_device {
     volume_size = 8
   }
@@ -35,71 +36,60 @@ resource "aws_instance" "swarm-manager" {
   }
 }
 
-resource "null_resource" "stack-deploy" {
+resource "null_resource" "stack_deploy" {
   depends_on = [
-    aws_instance.swarm-manager
+    aws_instance.swarm_manager
   ]
 
-  provisioner "file" {
-    connection {
-      user         = var.AWS_INSTANCE_USERNAME
-      private_key  = tls_private_key.swarmkey.private_key_pem
-      host         = aws_instance.swarm-leader.private_ip
-      bastion_host = aws_instance.main-bastion-instance.public_ip
-      bastion_user = var.AWS_INSTANCE_USERNAME
-    }
-
-    source      = var.TRAEFIK_FILE
-    destination = "${var.AWS_SHARED_VOLUME_MOUNTPOINT}/${var.TRAEFIK_FILE}"
-  }
-
-  provisioner "file" {
-    connection {
-      user         = var.AWS_INSTANCE_USERNAME
-      private_key  = tls_private_key.swarmkey.private_key_pem
-      host         = aws_instance.swarm-leader.private_ip
-      bastion_host = aws_instance.main-bastion-instance.public_ip
-      bastion_user = var.AWS_INSTANCE_USERNAME
-    }
-
-    source      = var.PORTAINER_FILE
-    destination = "${var.AWS_SHARED_VOLUME_MOUNTPOINT}/${var.PORTAINER_FILE}"
+  connection {
+    user         = var.AWS_INSTANCE_USERNAME
+    private_key  = tls_private_key.swarmkey.private_key_pem
+    host         = aws_instance.swarm_leader.private_ip
+    bastion_host = aws_instance.main_bastion_instance.public_ip
+    bastion_user = var.AWS_INSTANCE_USERNAME
+    timeout      = var.CONNECTION_TIMEOUT
   }
 
   provisioner "remote-exec" {
-    connection {
-      user         = var.AWS_INSTANCE_USERNAME
-      private_key  = tls_private_key.swarmkey.private_key_pem
-      host         = aws_instance.swarm-leader.private_ip
-      bastion_host = aws_instance.main-bastion-instance.public_ip
-      bastion_user = var.AWS_INSTANCE_USERNAME
-    }
-
     inline = [
-      "docker stack deploy -c ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/${var.TRAEFIK_FILE} traefik",
-      "docker stack deploy -c ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/${var.PORTAINER_FILE} portainer",
+      "while [ ! -f /tmp/cloud-init-complete ]; do sleep 5 && echo 'Waiting for cloud init complete'; done"
+    ]
+  }
+
+  provisioner "file" {
+    content     = data.template_file.traefik_stack_file.rendered
+    destination = "${var.AWS_SHARED_VOLUME_MOUNTPOINT}/docker-compose.traefik.yml"
+  }
+
+  provisioner "file" {
+    content     = data.template_file.portainer_stack_file.rendered
+    destination = "${var.AWS_SHARED_VOLUME_MOUNTPOINT}/docker-compose.portainer.yml"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "docker network create --driver overlay --attachable --subnet 10.10.0.0/16 traefik-public",
+      "mkdir -m 777 -p ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/traefik",
+      "mkdir -m 777 -p ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/portainer",
+      "docker stack deploy -c ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/docker-compose.traefik.yml traefik",
+      "docker stack deploy -c ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/docker-compose.portainer.yml portainer",
       "docker service ls"
     ]
   }
 }
 
-resource "aws_elb_attachment" "main-swarm-leader-elb-attachment" {
-  elb      = aws_elb.main-public-elb.id
-  instance = aws_instance.swarm-leader.id
+resource "aws_elb_attachment" "main_swarm_leader_elb_attachment" {
+  elb      = aws_elb.main_public_elb.id
+  instance = aws_instance.swarm_leader.id
 }
 
-resource "aws_elb_attachment" "main-swarm-manager-elb-attachment" {
-  count    = length(aws_instance.swarm-manager)
-  elb      = aws_elb.main-public-elb.id
-  instance = aws_instance.swarm-manager[count.index].id
+resource "aws_elb_attachment" "main_swarm_manager_elb_attachment" {
+  count    = length(aws_instance.swarm_manager)
+  elb      = aws_elb.main_public_elb.id
+  instance = aws_instance.swarm_manager[count.index].id
 }
 
-resource "local_file" "bastion-public-ip" {
-  content  = aws_instance.main-bastion-instance.public_ip
-  filename = "${path.cwd}/${var.BASTION_IP_FILE}"
-}
-
-resource "local_file" "swarm-leader-ip" {
-  content  = aws_instance.swarm-leader.private_ip
+resource "local_file" "swarm_leader_ip" {
+  content  = aws_instance.swarm_leader.private_ip
   filename = "${path.cwd}/${var.SWARM_LEADER_IP_FILE}"
 }

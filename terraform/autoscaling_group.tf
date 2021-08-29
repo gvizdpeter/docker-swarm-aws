@@ -1,19 +1,19 @@
-resource "aws_launch_configuration" "swarm-worker-launch-config" {
+resource "aws_launch_configuration" "swarm_worker_launch_config" {
   name_prefix     = "swarm-worker-"
-  image_id        = file(var.AWS_AMI_ID_FILE)
-  instance_type   = var.AWS_WORKER_INSTANCE_TYPE
+  image_id        = data.local_file.packer_ami_file.content
+  instance_type   = var.AWS_SWARM_INSTANCE_TYPE
   key_name        = aws_key_pair.swarmkey.key_name
-  security_groups = [aws_security_group.main-swarm-instance-security-group.id]
-  user_data       = data.template_cloudinit_config.swarm-worker-cloudinit.rendered
+  security_groups = [aws_security_group.main_swarm_instance_security_group.id]
+  user_data       = data.template_cloudinit_config.swarm_worker_cloudinit.rendered
   root_block_device {
     volume_size = 8
   }
 }
 
-resource "aws_autoscaling_group" "swarm-worker-autoscaling" {
+resource "aws_autoscaling_group" "swarm_worker_autoscaling" {
   name                      = "swarm-worker-autoscaling"
-  vpc_zone_identifier       = [aws_subnet.main-private-subnet.id]
-  launch_configuration      = aws_launch_configuration.swarm-worker-launch-config.name
+  vpc_zone_identifier       = [aws_subnet.main_private_subnet.id]
+  launch_configuration      = aws_launch_configuration.swarm_worker_launch_config.name
   min_size                  = var.AWS_MIN_WORKER_COUNT
   max_size                  = var.AWS_MAX_WORKER_COUNT
   health_check_grace_period = 30

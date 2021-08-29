@@ -1,10 +1,10 @@
-resource "aws_elb" "main-public-elb" {
+resource "aws_elb" "main_public_elb" {
   name            = "main-public-elb"
-  subnets         = [aws_subnet.main-public-subnet.id]
-  security_groups = [aws_security_group.main-elb-security-group.id]
+  subnets         = [aws_subnet.main_public_subnet.id]
+  security_groups = [aws_security_group.main_elb_security_group.id]
 
   depends_on = [
-    aws_acm_certificate.swarm-certificate
+    aws_acm_certificate.swarm_certificate
   ]
 
   listener {
@@ -12,7 +12,7 @@ resource "aws_elb" "main-public-elb" {
     instance_protocol  = "http"
     lb_port            = 443
     lb_protocol        = "https"
-    ssl_certificate_id = aws_acm_certificate.swarm-certificate.id
+    ssl_certificate_id = aws_acm_certificate.swarm_certificate.id
   }
 
   health_check {
