@@ -2,7 +2,7 @@
 
 set -eu
 
-export TF_VAR_AUTH_PASSWORD=$(htpasswd -nb -B admin "${AUTH_PASSWORD}" | cut -d ":" -f 2 | sed 's/\$/$$/g' | head -1)
+export TF_VAR_AUTH_PASSWORD=$(htpasswd -nbB admin "${AUTH_PASSWORD}" | cut -d ":" -f 2 | head -1)
 
 chmod a+x scripts/connect_bastion.sh
 

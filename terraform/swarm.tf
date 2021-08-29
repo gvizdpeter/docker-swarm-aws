@@ -36,48 +36,6 @@ resource "aws_instance" "swarm_manager" {
   }
 }
 
-resource "null_resource" "stack_deploy" {
-  depends_on = [
-    aws_instance.swarm_manager
-  ]
-
-  connection {
-    user         = var.AWS_INSTANCE_USERNAME
-    private_key  = tls_private_key.swarmkey.private_key_pem
-    host         = aws_instance.swarm_leader.private_ip
-    bastion_host = aws_instance.main_bastion_instance.public_ip
-    bastion_user = var.AWS_INSTANCE_USERNAME
-    timeout      = var.CONNECTION_TIMEOUT
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "while [ ! -f /tmp/cloud-init-complete ]; do sleep 5 && echo 'Waiting for cloud init complete'; done"
-    ]
-  }
-
-  provisioner "file" {
-    content     = data.template_file.traefik_stack_file.rendered
-    destination = "${var.AWS_SHARED_VOLUME_MOUNTPOINT}/docker-compose.traefik.yml"
-  }
-
-  provisioner "file" {
-    content     = data.template_file.portainer_stack_file.rendered
-    destination = "${var.AWS_SHARED_VOLUME_MOUNTPOINT}/docker-compose.portainer.yml"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "docker network create --driver overlay --attachable --subnet 10.10.0.0/16 traefik-public",
-      "mkdir -m 777 -p ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/traefik",
-      "mkdir -m 777 -p ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/portainer",
-      "docker stack deploy -c ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/docker-compose.traefik.yml traefik",
-      "docker stack deploy -c ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/docker-compose.portainer.yml portainer",
-      "docker service ls"
-    ]
-  }
-}
-
 resource "aws_elb_attachment" "main_swarm_leader_elb_attachment" {
   elb      = aws_elb.main_public_elb.id
   instance = aws_instance.swarm_leader.id

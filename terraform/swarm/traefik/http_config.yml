@@ -1,0 +1,6 @@
+http:
+  middlewares:
+    adminBasicAuth:
+      basicAuth:
+        users:
+          - "admin:${auth_password}"

@@ -1,0 +1,31 @@
+log:
+  filePath: "/var/log/traefik.log"
+  format: "json"
+  level: "WARN"
+
+accessLog:
+  filePath: "/var/log/access.log"
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true
+
+api:
+  dashboard: true
+  insecure: true
+
+providers:
+  docker:
+    exposedByDefault: false
+    swarmMode: true
+    endpoint: "unix:///var/run/docker.sock"
+    network: traefik-public
+    watch: true
+
+  file:
+    filename: "/http_config.yml"
+
+entryPoints:
+  web:
+   address: ":80"
