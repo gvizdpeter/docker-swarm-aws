@@ -1,7 +1,7 @@
 resource "aws_instance" "swarm_leader" {
   ami                    = data.local_file.packer_ami_file.content
   instance_type          = var.AWS_SWARM_INSTANCE_TYPE
-  subnet_id              = aws_subnet.main_private_subnet.id
+  subnet_id              = module.main_vpc.private_subnets[0]
   key_name               = aws_key_pair.swarmkey.key_name
   vpc_security_group_ids = [aws_security_group.main_swarm_instance_security_group.id]
   user_data              = data.template_cloudinit_config.swarm_leader_cloudinit.rendered
@@ -23,7 +23,7 @@ resource "aws_instance" "swarm_manager" {
   count                  = var.AWS_MANAGER_COUNT - 1
   ami                    = data.local_file.packer_ami_file.content
   instance_type          = var.AWS_SWARM_INSTANCE_TYPE
-  subnet_id              = aws_subnet.main_private_subnet.id
+  subnet_id              = module.main_vpc.private_subnets[0]
   key_name               = aws_key_pair.swarmkey.key_name
   vpc_security_group_ids = [aws_security_group.main_swarm_instance_security_group.id]
   user_data              = data.template_cloudinit_config.swarm_manager_cloudinit.rendered

@@ -6,3 +6,4 @@ terraform/ip-files/*
 !terraform/ip-files/.gitkeep
 terraform/packer/*.txt
 terraform/packer/*.log
+.idea

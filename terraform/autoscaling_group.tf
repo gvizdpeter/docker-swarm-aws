@@ -12,7 +12,7 @@ resource "aws_launch_configuration" "swarm_worker_launch_config" {
 
 resource "aws_autoscaling_group" "swarm_worker_autoscaling" {
   name                      = "swarm-worker-autoscaling"
-  vpc_zone_identifier       = [aws_subnet.main_private_subnet.id]
+  vpc_zone_identifier       = [module.main_vpc.private_subnets[0]]
   launch_configuration      = aws_launch_configuration.swarm_worker_launch_config.name
   min_size                  = var.AWS_MIN_WORKER_COUNT
   max_size                  = var.AWS_MAX_WORKER_COUNT

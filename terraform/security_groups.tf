@@ -1,12 +1,12 @@
 resource "aws_security_group" "main_elb_security_group" {
-  vpc_id = aws_vpc.main_vpc.id
+  vpc_id = module.main_vpc.vpc_id
   name   = "main-elb-security-group"
 
   egress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.main_private_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   ingress {
@@ -22,7 +22,7 @@ resource "aws_security_group" "main_elb_security_group" {
 }
 
 resource "aws_security_group" "main_swarm_instance_security_group" {
-  vpc_id = aws_vpc.main_vpc.id
+  vpc_id = module.main_vpc.vpc_id
   name   = "main-swarm-instance-security-group"
 
   ingress {
@@ -36,42 +36,42 @@ resource "aws_security_group" "main_swarm_instance_security_group" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.main_public_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.public_subnets_cidr_blocks[0]]
   }
 
   ingress {
     from_port   = 2049
     to_port     = 2049
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.main_public_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   ingress {
     from_port   = 2376
     to_port     = 2377
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.main_private_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   ingress {
     from_port   = 7946
     to_port     = 7946
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.main_private_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   ingress {
     from_port   = 7946
     to_port     = 7946
     protocol    = "udp"
-    cidr_blocks = [aws_subnet.main_private_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   ingress {
     from_port   = 4789
     to_port     = 4789
     protocol    = "udp"
-    cidr_blocks = [aws_subnet.main_private_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   egress {
@@ -87,7 +87,7 @@ resource "aws_security_group" "main_swarm_instance_security_group" {
 }
 
 resource "aws_security_group" "main_bastion_security_group" {
-  vpc_id = aws_vpc.main_vpc.id
+  vpc_id = module.main_vpc.vpc_id
   name   = "main-bastion-security-group"
 
   ingress {
@@ -101,7 +101,7 @@ resource "aws_security_group" "main_bastion_security_group" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.main_private_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   tags = {
@@ -110,21 +110,21 @@ resource "aws_security_group" "main_bastion_security_group" {
 }
 
 resource "aws_security_group" "main_efs_security_group" {
-  vpc_id = aws_vpc.main_vpc.id
+  vpc_id = module.main_vpc.vpc_id
   name   = "main-efs-security-group"
 
   ingress {
     from_port   = 2049
     to_port     = 2049
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.main_private_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   egress {
     from_port   = 2049
     to_port     = 2049
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.main_private_subnet.cidr_block]
+    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
   }
 
   tags = {

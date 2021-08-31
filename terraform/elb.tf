@@ -1,6 +1,6 @@
 resource "aws_elb" "main_public_elb" {
   name            = "main-public-elb"
-  subnets         = [aws_subnet.main_public_subnet.id]
+  subnets         = [module.main_vpc.public_subnets[0]]
   security_groups = [aws_security_group.main_elb_security_group.id]
 
   depends_on = [

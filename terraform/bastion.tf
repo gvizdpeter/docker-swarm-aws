@@ -1,12 +1,12 @@
 resource "aws_instance" "main_bastion_instance" {
   ami                    = var.DEFAULT_AMI_ID
   instance_type          = var.AWS_SWARM_INSTANCE_TYPE
-  subnet_id              = aws_subnet.main_public_subnet.id
+  subnet_id              = module.main_vpc.public_subnets[0]
   key_name               = aws_key_pair.swarmkey.key_name
   vpc_security_group_ids = [aws_security_group.main_bastion_security_group.id]
 
   depends_on = [
-    aws_route_table_association.main_public_route_table_assoc
+    module.main_vpc
   ]
 
   tags = {
