@@ -4,6 +4,11 @@ data "template_file" "object_definition_file" {
 }
 
 resource "null_resource" "docker_object_definition_copy" {
+
+  triggers = {
+    object_definition = md5(data.template_file.object_definition_file.rendered)
+  }
+
   connection {
     user         = local.connection.user
     private_key  = local.connection.private_key
@@ -22,6 +27,10 @@ resource "null_resource" "docker_object_definition_copy" {
 resource "null_resource" "docker_stack_creation" {
   count = var.object_type == "stack" ? 1 : 0
 
+  triggers = {
+    object_definition = md5(data.template_file.object_definition_file.rendered)
+  }
+
   connection {
     user         = local.connection.user
     private_key  = local.connection.private_key
@@ -33,7 +42,7 @@ resource "null_resource" "docker_stack_creation" {
 
   provisioner "remote-exec" {
     inline = [
-      "docker stack deploy -c ${local.remote_object_definition_file} ${var.object_name}"
+      "docker stack deploy -c ${local.remote_object_definition_file} ${local.object_name}"
     ]
   }
 }
@@ -41,6 +50,10 @@ resource "null_resource" "docker_stack_creation" {
 resource "null_resource" "docker_config_creation" {
   count = var.object_type == "config" ? 1 : 0
 
+  triggers = {
+    object_definition = md5(data.template_file.object_definition_file.rendered)
+  }
+
   connection {
     user         = local.connection.user
     private_key  = local.connection.private_key
@@ -52,7 +65,7 @@ resource "null_resource" "docker_config_creation" {
 
   provisioner "remote-exec" {
     inline = [
-      "docker config create ${var.object_name} ${local.remote_object_definition_file}"
+      "docker config create ${local.object_name} ${local.remote_object_definition_file}"
     ]
   }
 }
@@ -60,6 +73,10 @@ resource "null_resource" "docker_config_creation" {
 resource "null_resource" "docker_secret_creation" {
   count = var.object_type == "secret" ? 1 : 0
 
+  triggers = {
+    object_definition = md5(data.template_file.object_definition_file.rendered)
+  }
+
   connection {
     user         = local.connection.user
     private_key  = local.connection.private_key
@@ -71,7 +88,7 @@ resource "null_resource" "docker_secret_creation" {
 
   provisioner "remote-exec" {
     inline = [
-      "docker secret create ${var.object_name} ${local.remote_object_definition_file}",
+      "docker secret create ${local.object_name} ${local.remote_object_definition_file}",
       "rm ${local.remote_object_definition_file}"
     ]
   }

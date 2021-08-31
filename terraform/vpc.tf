@@ -1,5 +1,5 @@
 module "main_vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
   version = "~> 3.7.0"
 
   name = "main-vpc"
@@ -9,8 +9,8 @@ module "main_vpc" {
   public_subnets  = ["192.168.1.0/24"]
   private_subnets = ["192.168.2.0/24"]
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  enable_nat_gateway     = true
+  single_nat_gateway     = true
   one_nat_gateway_per_az = false
 
   enable_dns_support   = "true"

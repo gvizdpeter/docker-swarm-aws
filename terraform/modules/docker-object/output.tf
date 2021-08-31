@@ -3,5 +3,5 @@ output "object_defintion_content" {
 }
 
 output "object_name" {
-  value = var.object_name
+  value = local.object_name
 }

@@ -3,6 +3,10 @@ resource "null_resource" "docker_objects_preparation" {
     aws_instance.swarm_leader
   ]
 
+  triggers = {
+    timestamp = timestamp()
+  }
+
   connection {
     user         = local.connection.user
     private_key  = local.connection.private_key
@@ -20,7 +24,7 @@ resource "null_resource" "docker_objects_preparation" {
 
   provisioner "remote-exec" {
     inline = [
-      "docker network create --driver overlay --attachable --subnet 10.10.0.0/16 traefik-public",
+      "(docker network ls | grep traefik-public) || (docker network create --driver overlay --attachable --subnet 10.10.0.0/16 traefik-public)",
       "mkdir -m 777 -p ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/traefik",
       "mkdir -m 777 -p ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/portainer"
     ]

@@ -4,7 +4,7 @@ resource "aws_elb" "main_public_elb" {
   security_groups = [aws_security_group.main_elb_security_group.id]
 
   depends_on = [
-    aws_acm_certificate.swarm_certificate
+    module.swarm_acm
   ]
 
   listener {
@@ -12,7 +12,7 @@ resource "aws_elb" "main_public_elb" {
     instance_protocol  = "http"
     lb_port            = 443
     lb_protocol        = "https"
-    ssl_certificate_id = aws_acm_certificate.swarm_certificate.id
+    ssl_certificate_id = module.swarm_acm.acm_certificate_arn
   }
 
   health_check {

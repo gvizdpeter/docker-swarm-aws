@@ -39,39 +39,24 @@ resource "aws_security_group" "main_swarm_instance_security_group" {
     cidr_blocks = [module.main_vpc.public_subnets_cidr_blocks[0]]
   }
 
-  ingress {
-    from_port   = 2049
-    to_port     = 2049
-    protocol    = "tcp"
-    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
+  dynamic "ingress" {
+    for_each = local.swarm_tcp_ports
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
+    }
   }
 
-  ingress {
-    from_port   = 2376
-    to_port     = 2377
-    protocol    = "tcp"
-    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
-  }
-
-  ingress {
-    from_port   = 7946
-    to_port     = 7946
-    protocol    = "tcp"
-    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
-  }
-
-  ingress {
-    from_port   = 7946
-    to_port     = 7946
-    protocol    = "udp"
-    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
-  }
-
-  ingress {
-    from_port   = 4789
-    to_port     = 4789
-    protocol    = "udp"
-    cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
+  dynamic "ingress" {
+    for_each = local.swarm_udp_ports
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "udp"
+      cidr_blocks = [module.main_vpc.private_subnets_cidr_blocks[0]]
+    }
   }
 
   egress {

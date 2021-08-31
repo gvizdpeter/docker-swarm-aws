@@ -8,4 +8,5 @@ locals {
     bastion_user = var.connection_object.bastion_user != null ? var.connection_object.bastion_user : null
     timeout      = var.connection_object.timeout != null ? var.connection_object.timeout : "30s"
   }
+  object_name = var.object_type == "stack" ? var.object_name : "${var.object_name}_${formatdate("YYYY-MM-DD'T'hh-mm-ss", timestamp())}"
 }

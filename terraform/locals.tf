@@ -7,4 +7,13 @@ locals {
     bastion_user = var.AWS_INSTANCE_USERNAME
     timeout      = var.CONNECTION_TIMEOUT
   }
+  swarm_tcp_ports = [
+    2049,
+    2376,
+    7946
+  ]
+  swarm_udp_ports = [
+    7946,
+    4789
+  ]
 }
