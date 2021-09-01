@@ -4,7 +4,7 @@ resource "null_resource" "docker_objects_preparation" {
   ]
 
   triggers = {
-    timestamp = timestamp()
+    script = filemd5("${path.cwd}/scripts/docker_objects_preparation.sh")
   }
 
   connection {
@@ -22,11 +22,15 @@ resource "null_resource" "docker_objects_preparation" {
     ]
   }
 
+  provisioner "file" {
+    source      = "${path.cwd}/scripts/docker_objects_preparation.sh"
+    destination = "/tmp/docker_objects_preparation.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "(docker network ls | grep traefik-public) || (docker network create --driver overlay --attachable --subnet 10.10.0.0/16 traefik-public)",
-      "mkdir -m 777 -p ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/traefik",
-      "mkdir -m 777 -p ${var.AWS_SHARED_VOLUME_MOUNTPOINT}/portainer"
+      "sudo chmod +x /tmp/docker_objects_preparation.sh",
+      "/tmp/docker_objects_preparation.sh ${var.AWS_SHARED_VOLUME_MOUNTPOINT}",
     ]
   }
 }

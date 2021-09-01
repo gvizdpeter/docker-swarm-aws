@@ -9,4 +9,5 @@ locals {
     timeout      = var.connection_object.timeout != null ? var.connection_object.timeout : "30s"
   }
   object_name = var.object_type == "stack" ? var.object_name : "${var.object_name}_${formatdate("YYYY-MM-DD'T'hh-mm-ss", timestamp())}"
+  object_defintion_variables_string = format("%s||%s", join("|", keys(var.object_defintion_variables)), join("|", values(var.object_defintion_variables)))
 }
