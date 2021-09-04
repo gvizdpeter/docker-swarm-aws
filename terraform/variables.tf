@@ -53,18 +53,6 @@ variable "MANAGER_TOKEN_FILE" {
   description = "Path to manager token file"
 }
 
-variable "AWS_SWARM_SSH_PRIVATE_KEY_PATH" {
-  type        = string
-  default     = "ssh/swarmkey"
-  description = "Path to SSH private key"
-}
-
-variable "AWS_SWARM_SSH_PUBLIC_KEY_PATH" {
-  type        = string
-  default     = "ssh/swarmkey.pub"
-  description = "Path to SSH public key"
-}
-
 variable "AWS_INSTANCE_USERNAME" {
   type        = string
   default     = "ubuntu"
@@ -86,18 +74,6 @@ variable "AWS_SHARED_VOLUME_MOUNTPOINT" {
   type        = string
   default     = "/mnt/shared_data"
   description = "Shared volume mountpoint of docker swarm nodes"
-}
-
-variable "BASTION_IP_FILE" {
-  type        = string
-  default     = "ip-files/ip-bastion.txt"
-  description = "Output file for bastion IP"
-}
-
-variable "SWARM_LEADER_IP_FILE" {
-  type        = string
-  default     = "ip-files/ip-swarm-leader.txt"
-  description = "Output file for swarm leader IP"
 }
 
 variable "LOW_CPU_THRESH" {

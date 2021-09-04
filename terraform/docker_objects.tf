@@ -66,7 +66,6 @@ module "docker_config_traefik" {
 
 module "docker_stack_traefik" {
   depends_on = [
-    null_resource.docker_objects_preparation,
     module.docker_config_traefik,
     module.docker_config_traefik_http
   ]
@@ -88,8 +87,7 @@ module "docker_stack_traefik" {
 
 module "docker_stack_portainer" {
   depends_on = [
-    null_resource.docker_objects_preparation,
-    module.docker_stack_traefik
+    null_resource.docker_objects_preparation
   ]
 
   source = "./modules/docker-object"

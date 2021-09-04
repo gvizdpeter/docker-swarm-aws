@@ -4,8 +4,6 @@ set -eu
 
 export TF_VAR_AUTH_PASSWORD=$(htpasswd -nbB admin "${AUTH_PASSWORD}" | cut -d ":" -f 2 | head -1)
 
-chmod a+x scripts/connect_bastion.sh
-
 terraform init \
     -input=false \
     -backend-config="bucket=${S3_BACKEND_BUCKET}" \

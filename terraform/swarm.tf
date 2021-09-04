@@ -46,8 +46,3 @@ resource "aws_elb_attachment" "main_swarm_manager_elb_attachment" {
   elb      = aws_elb.main_public_elb.id
   instance = aws_instance.swarm_manager[count.index].id
 }
-
-resource "local_file" "swarm_leader_ip" {
-  content  = aws_instance.swarm_leader.private_ip
-  filename = "${path.cwd}/${var.SWARM_LEADER_IP_FILE}"
-}

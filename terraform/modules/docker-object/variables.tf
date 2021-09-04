@@ -13,7 +13,7 @@ variable "object_type" {
   description = "Docker object type"
 
   validation {
-    condition     = contains(["stack", "config", "secret"], var.object_type)
+    condition     = contains(["stack", "config"], var.object_type)
     error_message = "Valid values for object_type are (stack, config)."
   }
 }

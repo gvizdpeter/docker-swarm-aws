@@ -13,8 +13,3 @@ resource "aws_instance" "main_bastion_instance" {
     Name = "main-bastion-instance"
   }
 }
-
-resource "local_file" "bastion_public_ip" {
-  content  = aws_instance.main_bastion_instance.public_ip
-  filename = "${path.cwd}/${var.BASTION_IP_FILE}"
-}
