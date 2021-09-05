@@ -8,4 +8,5 @@ locals {
     bastion_user = var.connection_object.bastion_user != null ? var.connection_object.bastion_user : null
     timeout      = var.connection_object.timeout != null ? var.connection_object.timeout : "30s"
   }
+  object_defintion_md5 = md5(data.template_file.object_definition_file.rendered)
 }

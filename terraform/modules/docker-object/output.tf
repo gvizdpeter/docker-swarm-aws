@@ -3,5 +3,5 @@ output "object_defintion_content" {
 }
 
 output "object_name" {
-  value = var.object_name
+  value = var.object_type == "stack" ? null_resource.docker_stack_creation[0].triggers.object_name : null_resource.docker_config_creation[0].triggers.object_name
 }

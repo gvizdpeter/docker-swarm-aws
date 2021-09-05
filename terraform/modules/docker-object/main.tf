@@ -5,8 +5,7 @@ data "template_file" "object_definition_file" {
 
 resource "null_resource" "docker_object_definition_copy" {
   triggers = {
-    object_definition_template    = filemd5(var.object_definition_file)
-    object_defintion_variables    = md5(jsonencode(var.object_defintion_variables))
+    object_defintion_md5          = local.object_defintion_md5
     user                          = local.connection.user
     private_key                   = local.connection.private_key
     host                          = local.connection.host
@@ -46,15 +45,14 @@ resource "null_resource" "docker_stack_creation" {
   ]
 
   triggers = {
-    object_definition_template = filemd5(var.object_definition_file)
-    object_defintion_variables = md5(jsonencode(var.object_defintion_variables))
-    user                       = local.connection.user
-    private_key                = local.connection.private_key
-    host                       = local.connection.host
-    bastion_host               = local.connection.bastion_host
-    bastion_user               = local.connection.bastion_user
-    timeout                    = local.connection.timeout
-    object_name                = var.object_name
+    object_defintion_md5 = local.object_defintion_md5
+    user                 = local.connection.user
+    private_key          = local.connection.private_key
+    host                 = local.connection.host
+    bastion_host         = local.connection.bastion_host
+    bastion_user         = local.connection.bastion_user
+    timeout              = local.connection.timeout
+    object_name          = var.object_name
   }
 
   connection {
@@ -88,15 +86,14 @@ resource "null_resource" "docker_config_creation" {
   ]
 
   triggers = {
-    object_definition_template = filemd5(var.object_definition_file)
-    object_defintion_variables = md5(jsonencode(var.object_defintion_variables))
-    user                       = local.connection.user
-    private_key                = local.connection.private_key
-    host                       = local.connection.host
-    bastion_host               = local.connection.bastion_host
-    bastion_user               = local.connection.bastion_user
-    timeout                    = local.connection.timeout
-    object_name                = var.object_name
+    object_defintion_md5 = local.object_defintion_md5
+    user                 = local.connection.user
+    private_key          = local.connection.private_key
+    host                 = local.connection.host
+    bastion_host         = local.connection.bastion_host
+    bastion_user         = local.connection.bastion_user
+    timeout              = local.connection.timeout
+    object_name          = "${var.object_name}_${substr(local.object_defintion_md5, 0, 16)}"
   }
 
   connection {
