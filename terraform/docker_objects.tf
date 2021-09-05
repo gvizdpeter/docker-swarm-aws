@@ -5,15 +5,22 @@ resource "null_resource" "docker_objects_preparation" {
 
   triggers = {
     script = filemd5("${path.cwd}/scripts/docker_objects_preparation.sh")
-  }
-
-  connection {
     user         = local.connection.user
     private_key  = local.connection.private_key
     host         = local.connection.host
     bastion_host = local.connection.bastion_host
     bastion_user = local.connection.bastion_user
     timeout      = local.connection.timeout
+    shared_volume_mountpoint = var.AWS_SHARED_VOLUME_MOUNTPOINT
+  }
+
+  connection {
+    user         = self.triggers.user
+    private_key  = self.triggers.private_key
+    host         = self.triggers.host
+    bastion_host = self.triggers.bastion_host
+    bastion_user = self.triggers.bastion_user
+    timeout      = self.triggers.timeout
   }
 
   provisioner "remote-exec" {
@@ -30,7 +37,21 @@ resource "null_resource" "docker_objects_preparation" {
   provisioner "remote-exec" {
     inline = [
       "sudo chmod +x /tmp/docker_objects_preparation.sh",
-      "/tmp/docker_objects_preparation.sh ${var.AWS_SHARED_VOLUME_MOUNTPOINT}",
+      "/tmp/docker_objects_preparation.sh ${self.triggers.shared_volume_mountpoint} create",
+    ]
+  }
+
+  provisioner "file" {
+    when        = destroy
+    source      = "${path.cwd}/scripts/docker_objects_preparation.sh"
+    destination = "/tmp/docker_objects_preparation.sh"
+  }
+
+  provisioner "remote-exec" {
+    when = destroy
+    inline = [
+      "sudo chmod +x /tmp/docker_objects_preparation.sh",
+      "/tmp/docker_objects_preparation.sh ${self.triggers.shared_volume_mountpoint} destroy",
     ]
   }
 }
